@@ -21,6 +21,7 @@
 #include "main.h"
 #include "stm32f4xx_it.h"
 #include "seg7.h"
+#include "tmpl.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -184,6 +185,7 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
+timer_step();
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
 COUNT++;  // Increment note duration counter
