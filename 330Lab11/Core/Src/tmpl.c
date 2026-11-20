@@ -128,7 +128,7 @@ extern void input_poll ( void )
 	poll_potentiometers();
 
 	// todo: poll any other input devices
-	//
+	// FIX / ADD, Reading buttons from hardware
 
 	// done
 	return;
@@ -139,7 +139,7 @@ static void poll_switches ( void )
 
 	// todo: store the state of the switches in device_state.sw
 	//
-	device_state.sw = sw;
+	device_state.sw = sw; // FIX, read from hardware
 
 	// done
 	return;
@@ -151,7 +151,7 @@ static void poll_potentiometers ( void )
 	// todo: iterate through each potentiometer and store the value in the corresponding index of device_state._pa
 	//
 	for (int i = 0; i < 3; i++){
-		device_state._pa[0] = _pa[0];
+		device_state._pa[0] = _pa[0]; // FIX, ADC conversions to hardware
 	}
 	// done
 	return;
@@ -266,7 +266,7 @@ extern void draw_board ( map _map )
 				_board[i] |= 0;
 				break;
 			case HIT:
-				_board[i] |= SEG7_TOP_LEFT;
+				_board[i] |= SEG7_TOP_LEFT; // FIX, change to TOP right
 				break;
 			case MISS:
 				_board[i] |= should_dim ? SEG7_TOP_LEFT : 0;
@@ -278,7 +278,7 @@ extern void draw_board ( map _map )
 
 		// todo: set the bottom left segment based on the vertical[1] map
 		//
-		switch(_map.vertical[0][2*i])
+		switch(_map.vertical[0][2*i]) // FIX, bottom should be index 1 of vertical
 		{
 			case STILL:
 				_board[i] |= 0;
@@ -297,7 +297,7 @@ extern void draw_board ( map _map )
 
 		// todo: set the bottom right segment based on the vertical[1] map
 		//
-		switch(_map.vertical[0][(2*i)+1])
+		switch(_map.vertical[0][(2*i)+1]) // FIX, bottom should be index 1 of vertical
 		{
 			case STILL:
 				_board[i] |= 0;
