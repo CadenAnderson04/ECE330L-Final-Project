@@ -128,7 +128,8 @@ extern void input_poll ( void )
 	poll_potentiometers();
 
 	// todo: poll any other input devices
-	// FIX / ADD, Reading buttons from hardware
+	device_state.pc10 = ((GPIOC-> IDR & (1 << 10)) == 0); // PC10 button enter when low/pressed
+	device_state.pc11 = (GPIOC-> IDR & (1 << 11)) == 0; // PC11 button enter when low/pressed
 
 	// done
 	return;
@@ -139,7 +140,7 @@ static void poll_switches ( void )
 
 	// todo: store the state of the switches in device_state.sw
 	//
-	device_state.sw = sw; // FIX, read from hardware
+	device_state.sw = GPIOC->IDR;
 
 	// done
 	return;
@@ -151,7 +152,12 @@ static void poll_potentiometers ( void )
 	// todo: iterate through each potentiometer and store the value in the corresponding index of device_state._pa
 	//
 	for (int i = 0; i < 3; i++){
-		device_state._pa[0] = _pa[0]; // FIX, ADC conversions to hardware
+		ADC1->SQR3 = i + 1; //ADC Channel i + 1 set for potentiometer
+		ADC1->CR2 |= (1<<30); // Start a conversion on ADCi+1 by forcing bit 30 in CR2 to 1 while keeping other bits unchanged
+		if (ADC1->SR & 1<<1) {
+			analog_value = (ADC1->DR); // capture analog value
+			device_state._pa[i] = analog_value;
+		}
 	}
 	// done
 	return;
@@ -266,19 +272,19 @@ extern void draw_board ( map _map )
 				_board[i] |= 0;
 				break;
 			case HIT:
-				_board[i] |= SEG7_TOP_LEFT; // FIX, change to TOP right
+				_board[i] |= SEG7_TOP_RIGHT;
 				break;
 			case MISS:
-				_board[i] |= should_dim ? SEG7_TOP_LEFT : 0;
+				_board[i] |= should_dim ? SEG7_TOP_RIGHT : 0;
 				break;
 			case CURSOR:
-				_board[i] |= should_blink ? SEG7_TOP_LEFT : 0;
+				_board[i] |= should_blink ? SEG7_TOP_RIGHT : 0;
 				break;
 		}
 
 		// todo: set the bottom left segment based on the vertical[1] map
 		//
-		switch(_map.vertical[0][2*i]) // FIX, bottom should be index 1 of vertical
+		switch(_map.vertical[1][2*i])
 		{
 			case STILL:
 				_board[i] |= 0;
@@ -297,7 +303,7 @@ extern void draw_board ( map _map )
 
 		// todo: set the bottom right segment based on the vertical[1] map
 		//
-		switch(_map.vertical[0][(2*i)+1]) // FIX, bottom should be index 1 of vertical
+		switch(_map.vertical[1][(2*i)+1])
 		{
 			case STILL:
 				_board[i] |= 0;
