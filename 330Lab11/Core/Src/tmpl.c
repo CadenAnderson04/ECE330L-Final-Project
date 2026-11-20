@@ -8,6 +8,7 @@
 
 // headers
 #include "tmpl.h"
+#include <string.h>
 
 // forward declarations
 static void poll_switches ( void );
@@ -407,9 +408,51 @@ void state_start ( void )
 {
 
 	// todo
-	//
+    static bool initialized = false;
 
-	// done
+    // Static storage keeps the message available to SysTick.
+    static char title[] =
+    {
+        SPACE, SPACE, SPACE, SPACE,
+        SPACE, SPACE, SPACE, SPACE,
+
+        CHAR_B, CHAR_A, CHAR_T, CHAR_T, CHAR_L,
+        CHAR_E, CHAR_S, CHAR_H, CHAR_I, CHAR_P,
+
+        SPACE, SPACE, SPACE, SPACE,
+        SPACE, SPACE, SPACE, SPACE
+    };
+
+    // Initialize once when entering the start screen.
+    if (!initialized)
+    {
+        // Pause scrolling while updating the marquee settings.
+        Animate_On = 0;
+
+        // Clear both players' maps and boat counts.
+        // STILL is zero in the template.
+        memset(players, 0, sizeof(players));
+
+        Save_Pointer = title;
+        Message_Pointer = title;
+        Message_Length = (char)(sizeof(title) / sizeof(title[0]));
+
+        Delay_msec = 200;
+        Delay_counter = 0;
+
+        Animate_On = 1;
+        initialized = true;
+    }
+
+    // Prepare to leave the start screen.
+    if (device_state.pc10)
+    {
+        Animate_On = 0;
+
+        // Allow initialization when a future game returns here.
+        initialized = false;
+    }
+
 	return;
 }
 
